@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go-ambassador/src/database"
 	"go-ambassador/src/models"
-	"golang.org/x/crypto/bcrypt"
 	"strconv"
 	"time"
 )
@@ -31,15 +30,13 @@ func Register(c *fiber.Ctx) error {
 		})
 	}
 
-	password, _ := bcrypt.GenerateFromPassword([]byte(data["password"]), 12)
-
 	user := models.User{
 		FristName:    data["frist_name"],
 		LastMame:     data["last_name"],
 		Email:        data["email"],
-		Password:     password,
 		IsAmbassador: false,
 	}
+	user.SetPassword(data["password"])
 
 	database.DB.Create(&user)
 
@@ -64,7 +61,7 @@ func Login(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(data["password"])); err != nil {
+	if err := user.ComparePassword(data["password"]); err != nil {
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{
 			"message": "invalid credential",
