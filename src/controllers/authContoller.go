@@ -32,7 +32,7 @@ func Register(c *fiber.Ctx) error {
 
 	user := models.User{
 		FristName:    data["frist_name"],
-		LastMame:     data["last_name"],
+		LastName:     data["last_name"],
 		Email:        data["email"],
 		IsAmbassador: false,
 	}
