@@ -25,4 +25,15 @@ func Setus(app *fiber.App) {
 	adminAuthenticated.Delete("products/:id", controllers.DeleteProduct)
 	adminAuthenticated.Get("users/:id/link", controllers.Link)
 	adminAuthenticated.Get("orders", controllers.Orders)
+
+	ambassador := api.Group("ambassador")
+	ambassador.Post("register", controllers.Register)
+	ambassador.Post("login", controllers.Login)
+
+	ambassadorAuthenticated := ambassador.Use(middlewares.IsAuthenticated)
+	ambassadorAuthenticated.Get("user", controllers.User)
+	ambassadorAuthenticated.Put("user/info", controllers.UpdateInfo)
+	ambassadorAuthenticated.Put("user/password", controllers.UpdatePassword)
+	ambassadorAuthenticated.Post("logout", controllers.Logout)
+
 }

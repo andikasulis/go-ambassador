@@ -8,6 +8,7 @@ import (
 	"go-ambassador/src/middlewares"
 	"go-ambassador/src/models"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func Register(c *fiber.Ctx) error {
 		FristName:    data["frist_name"],
 		LastName:     data["last_name"],
 		Email:        data["email"],
-		IsAmbassador: false,
+		IsAmbassador: strings.Contains(c.Path(), "/api/ambassador"),
 	}
 	user.SetPassword(data["password"])
 
