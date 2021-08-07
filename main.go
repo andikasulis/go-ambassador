@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/gofiber/fiber/v2/utils"
 	"go-ambassador/src/database"
 	"go-ambassador/src/routes"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
@@ -26,6 +26,10 @@ func main() {
 			return utils.UUID()
 		},
 		ContextKey: "requestid",
+	}))
+
+	app.Use(logger.New(logger.Config{
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
 	}))
 
 	routes.Setus(app)
