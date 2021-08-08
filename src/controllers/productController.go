@@ -8,6 +8,7 @@ import (
 	"go-ambassador/src/database"
 	"go-ambassador/src/models"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -95,4 +96,42 @@ func ProductFrontend(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(products)
+}
+
+func ProductBackend(c *fiber.Ctx) error {
+	var products []models.Product
+	var ctx = context.Background()
+
+	result, err := database.Cache.Get(ctx, "products_backend").Result()
+
+	if err != nil {
+		fmt.Println(err.Error())
+		database.DB.Find(&products)
+
+		bytes, err := json.Marshal(products)
+
+		if err != nil {
+			panic(err)
+		}
+
+		database.Cache.Set(ctx, "products_backend", bytes, 30*time.Minute).Err()
+
+	} else {
+		json.Unmarshal([]byte(result), &products)
+	}
+
+	var searchProducts []models.Product
+
+	if s := c.Query("s"); s != "" {
+		lower := strings.ToLower(s)
+		for _, products := range products {
+			if strings.Contains(strings.ToLower(products.Title), lower) || strings.Contains(strings.ToLower(products.Description), lower) {
+				searchProducts = append(searchProducts, products)
+			}
+		}
+	} else {
+		searchProducts = products
+	}
+
+	return c.JSON(searchProducts)
 }
