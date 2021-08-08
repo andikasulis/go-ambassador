@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"go-ambassador/src/database"
 	"go-ambassador/src/middlewares"
@@ -115,7 +114,11 @@ func User(c *fiber.Ctx) error {
 
 	database.DB.Where("id = ?", id).First(&user)
 
-	fmt.Println(c.BaseURL())
+	if strings.Contains(c.Path(), "/api/ambassador") {
+		ambassador := models.Ambassador(user)
+		ambassador.CalculateRevenue(database.DB)
+		return c.JSON(ambassador)
+	}
 
 	return c.JSON(user)
 }
