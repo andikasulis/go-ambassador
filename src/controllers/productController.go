@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go-ambassador/src/database"
 	"go-ambassador/src/models"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -131,6 +132,19 @@ func ProductBackend(c *fiber.Ctx) error {
 		}
 	} else {
 		searchProducts = products
+	}
+
+	if sortParam := c.Query("sort"); sortParam != "" {
+		sortLower := strings.ToLower(sortParam)
+		if sortLower == "asc" {
+			sort.Slice(searchProducts, func(i, j int) bool {
+				return searchProducts[i].Price < searchProducts[j].Price
+			})
+		} else if sortLower == "desc" {
+			sort.Slice(searchProducts, func(i, j int) bool {
+				return searchProducts[i].Price > searchProducts[j].Price
+			})
+		}
 	}
 
 	return c.JSON(searchProducts)
