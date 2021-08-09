@@ -13,6 +13,8 @@ import (
 func main() {
 	database.Connect()
 	database.AutoMigrate()
+	database.SetupRedis()
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
